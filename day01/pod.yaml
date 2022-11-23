@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-first-pod
+  labels:
+    app: shell-server
+spec:
+  containers:
+  - name: my-shell
+    image: raesene/ncat
+    command: ["ncat"]
+    args: ["-lvnp","8888","-e","/bin/sh"]
+    ports:
+    - containerPort: 8888
+  - name: my-nginx
+    image: nginx

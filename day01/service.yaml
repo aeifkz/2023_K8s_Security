@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-shell
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    nodePort: 30390
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: shell-server

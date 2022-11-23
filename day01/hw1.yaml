@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: practice-impersonate
+  namespace: default
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: practice-impersonate
+  annotations:
+    kubernetes.io/service-account.name: "practice-impersonate"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: practice-impersonate-cluster-role
+rules:
+- apiGroups: ["*"]
+  resources: ["users", "groups", "serviceaccounts"]
+  verbs: ["impersonate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: practice-impersonate-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: practice-impersonate-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: practice-impersonate
+  namespace: default
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: practice-impersonate
+  labels:
+    app: hw1
+spec:
+  containers:
+  - name: practice-impersonate
+    image:  raesene/ncat
+    command: ["ncat"]
+    args: ["-lvnp","8889","-e","/bin/sh"]
+    ports:
+    - containerPort: 8889
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+  serviceAccount: practice-impersonate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-hw1
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    nodePort: 30391
+    protocol: TCP
+    targetPort: 8889
+  selector:
+    app: hw1
