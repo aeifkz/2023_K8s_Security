@@ -66,6 +66,12 @@ then
 
 	rm master_flag 
 	rm vm_flag
+	rm quiz-0.yaml
+	rm quiz-1.yaml
+	rm quiz-2.yaml
+	rm quiz-3.yaml
+	rm quiz-4.yaml
+	rm quiz-5.yaml
 
 	echo "07. kill all kubectl port-forward process"
 	kill -9 `ps aux | grep port-forward | grep -v grep | awk '{printf $2 " " }'`
