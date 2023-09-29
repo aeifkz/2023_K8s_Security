@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quiz-0
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: quiz-0
+  namespace: quiz-0
+  labels:
+    app: quiz-0
+spec:
+  containers:
+  - name: target-pod
+    image: aeifkz/my-ubuntu:v1.0
+    ports:
+      - containerPort: 30089
+    securityContext:
+      privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-quiz0
+  namespace: quiz-0
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30389
+    protocol: TCP
+    targetPort: 30089
+  selector:
+    app: quiz-0
+
+

@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quiz-3
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: log-sa
+  namespace: quiz-3
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: log-sa-token
+  annotations:
+    kubernetes.io/service-account.name: "log_sa"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: quiz-3
+  name: list-and-logs
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: quiz-3
+  name: practice-log-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: list-and-logs
+subjects:
+- kind: ServiceAccount
+  name: log-sa
+  namespace: quiz-3
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: quiz-3
+  namespace: quiz-3
+  labels:
+    app: quiz-3
+spec:
+  containers:
+  - name: target-pod
+    image: aeifkz/my-ubuntu:v1.0
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log/host
+    ports:
+      - containerPort: 30089
+    securityContext:
+      capabilities:
+        drop:
+          - all
+  volumes:
+  - name: logs
+    hostPath:
+      path: /var/log/
+      type: Directory
+  serviceAccount: log-sa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-quiz3
+  namespace: quiz-3
+spec:
+  type: NodePort
+  ports:
+  - port: 8083
+    nodePort: 30393
+    protocol: TCP
+    targetPort: 30089
+  selector:
+    app: quiz-3
+
