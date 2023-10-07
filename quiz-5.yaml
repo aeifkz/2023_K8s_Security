@@ -54,7 +54,7 @@ spec:
       - "/tools/client.sh"
       - "service-quiz5-server"
       - "8000"
-      - "The_Quintessential_Quintuplets"
+      - "flag{The_Quintessential_Quintuplets}"
 ---
 apiVersion: v1
 kind: Service
